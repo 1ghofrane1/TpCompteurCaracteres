@@ -13,15 +13,16 @@ public class MainAvecExecutor {
         // La liste des tâches à exécuter (chaque tâche est un Callable)
 
         // TODO : décommenter lorsque la classe CompteurDeCaracteresCallable est prête
-        // List<CompteurDeCaracteresCallable> taches = List.of(
-        // new CompteurDeCaracteresCallable("http://www.univ-jfc.fr"),
-        // new CompteurDeCaracteresCallable("https://www.irit.fr/"),
-        // new CompteurDeCaracteresCallable("http://www.google.fr"),
-        // new CompteurDeCaracteresCallable("https://www.netflix.com/browse"),
-        // new CompteurDeCaracteresCallable("https://nodejs.org/fr"));
+         List<CompteurDeCaracteresCallable> taches = List.of(
+         new CompteurDeCaracteresCallable("http://www.univ-jfc.fr"),
+         new CompteurDeCaracteresCallable("https://www.irit.fr/"),
+         new CompteurDeCaracteresCallable("http://www.google.fr"),
+         new CompteurDeCaracteresCallable("https://www.netflix.com/browse"),
+         new CompteurDeCaracteresCallable("https://nodejs.org/fr"));
 
         // TODO : Création d’un pool de threads fixe (ExecutorService). Utiliser
         // la classe Executors et la variable MAX_THREADS_SIMULT.
+        ExecutorService executor = Executors.newFixedThreadPool(MAX_THREADS_SIMULT);
         // Tip : choisir la bonne méthode statique parmi celles qui sont fournies par
         // Executors
 
@@ -31,13 +32,20 @@ public class MainAvecExecutor {
             Duration sommeDesTemps = Duration.ZERO;
 
             // TODO : Soumission des tâches au pool avec "invokeAll"
+
             // l'invocation est bloquante et renvoie une liste de Futures qu'il faut
             // conserver dans une variable locale pour les ré-utiliser plus tard
-            // List<Future<xxx>> resultatsFuturs = ...;
+             List<Future<ResultatDuCompte>> resultatsFuturs = executor.invokeAll(taches);
 
             // TODO : récupérer le résultat de chaque future avec get() (bloquant) et
             // exploiter-le. Pour cela utiliser une boucle for
-            // for (Future<xxx> futur : resultatsFuturs) {
+             for (Future<ResultatDuCompte> futur : resultatsFuturs) {
+                    ResultatDuCompte res = futur.get();
+                    if (res != null) {
+                        totalCaracteres += res.nombreDeCaracteres;
+                        sommeDesTemps = sommeDesTemps.plus(res.tempsDeCalcul);
+                    }
+                }
             // // Récupération des résultats via Future.get()
             // // ResultatDuCompte resultat = ...;
             // // etc.
@@ -51,6 +59,7 @@ public class MainAvecExecutor {
 
         } finally {
             // TODO : Fermeture du pool
+            executor.shutdown();
         }
     }
 }
